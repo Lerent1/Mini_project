@@ -22,7 +22,9 @@
                 </div>
 
                 <div class="card-body">
-                    <form th:action="@{/add}" method="post" th:object="${todo}">
+                    <form th:action="@{/save}" method="post" th:object="${todo}">
+                        <input type="hidden" th:field="*{id}">
+                        <input type="hidden" th:field="*{status}">
 
                         <div class="form-group">
                             <label>Noi dung</label>
@@ -39,15 +41,19 @@
                         <div class="form-group">
                             <label>Do uu tien</label>
                             <select class="form-control" th:field="*{priority}">
+                                <option value="">Chon</option>
                                 <option value="LOW">LOW</option>
                                 <option value="MEDIUM">MEDIUM</option>
                                 <option value="HIGH">HIGH</option>
                             </select>
                         </div>
 
-                        <div class="d-flex justify-content-between">
-                            <a href="/" class="btn btn-secondary">Quay lai</a>
-                            <button type="submit" class="btn btn-success">Luu</button>
+                        <div class="flex justify-content-between">
+                            <a th:href="@{/}" class="btn btn-secondary">Quay lai</a>
+
+                            <button type="submit" class="btn btn-success">
+                                <span th:text="${todo.id == null} ? 'Them' : 'Cap nhat'"></span>
+                            </button>
                         </div>
 
                     </form>

@@ -9,7 +9,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,16 +30,39 @@ public class TodoController {
         return "form";
     }
 
-    @PostMapping("/add")
-    public String addTodo(
+    @PostMapping("/save")
+    public String saveTodo(
             @Valid @ModelAttribute("todo") Todo todo,
-            BindingResult bindingResult
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
             return "form";
         }
-        todo.setStatus("PENDING");
+
+        if (todo.getId() == null) {
+            todo.setStatus("PENDING");
+        }
         todoRepository.save(todo);
+
+        redirectAttributes.addFlashAttribute("message", "Thao tac thanh cong");
+        return "redirect:/";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String edit(@PathVariable Long id, Model model) {
+        Todo todo = todoRepository.findTodoById(id);
+        model.addAttribute("todo", todo);
+        return "form";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String delete(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes
+    ) {
+        todoRepository.deleteById(id);
+        redirectAttributes.addFlashAttribute("message", "Xoa thanh cong");
         return "redirect:/";
     }
 }
