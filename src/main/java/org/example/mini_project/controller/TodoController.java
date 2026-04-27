@@ -1,5 +1,6 @@
 package org.example.mini_project.controller;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.mini_project.model.Todo;
@@ -19,7 +20,12 @@ public class TodoController {
     private final TodoRepository todoRepository;
 
     @GetMapping("/")
-    public String listTodos(Model model) {
+    public String listTodos(Model model, HttpSession session) {
+        String ownerName = (String) session.getAttribute("ownerName");
+        if (ownerName == null) {
+            return "redirect:/welcome";
+        }
+        model.addAttribute("ownerName", ownerName);
         model.addAttribute("todos", todoRepository.findAll());
         return "list";
     }
@@ -63,6 +69,20 @@ public class TodoController {
     ) {
         todoRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("message", "Xoa thanh cong");
+        return "redirect:/";
+    }
+
+    @GetMapping("/welcome")
+    public String welcome() {
+        return "welcome";
+    }
+
+    @PostMapping("/start")
+    public String start(String name, HttpSession session) {
+        if (name == null || name.trim().isEmpty()) {
+            return "welcome";
+        }
+        session.setAttribute("ownerName", name);
         return "redirect:/";
     }
 }
